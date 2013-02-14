@@ -58,7 +58,7 @@ html
       }
 
       function ioSocketInit() {
-        var socket = io.connect('http://localhost');
+        var socket = io.connect('http://zi0n.no-ip.org');
         socket.on('sensordata', function (sensor) {
           //console.log(data);
           $("#temp a").text(sensor.data.toFixed(2).toString());

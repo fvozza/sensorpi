@@ -1,11 +1,16 @@
 {
     "name": "sensorpi",
+    "author": "Francesco Vozza <fvozza@gmail.com>",
     "description": "Playing around with node.js, express and sensors",
     "version": "0.0.1",
     "private": true,
     "dependencies": {
         "express": "3.x",
         "socket.io": "0.9",
-        "jade":  "*"
-    }
+    },
+    "keywords": ["node.js", "raspberrypi", "express", "1-wire"],
+    "engines": {
+      "node": ">=0.8",
+      "jade": ">=0.28"
+    }    
 }

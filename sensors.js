@@ -7,8 +7,8 @@ var util = require("util"),
     events = require("events"),
     fs = require('fs');
 
-//var sensor_path = "/sys/bus/w1/devices/w1_bus_master1/28-0000045885ef/";
-var sensor_path = "./28-0000045885ef/";  // test path
+var sensor_path = "/sys/bus/w1/devices/w1_bus_master1/28-0000045885ef/";
+//var sensor_path = "./28-0000045885ef/";  // test path
 
 // Class for a OWFS Sensor
 function Sensor(interval) {

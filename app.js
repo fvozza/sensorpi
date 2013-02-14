@@ -10,7 +10,7 @@ var app = express()
   , io = require('socket.io').listen(server);
 
 // app.listen(8000); won't work with socket.io
-server.listen(8000);
+server.listen(80);
 
 app.use(express.logger({format: 'short'}));
 app.use(express.errorHandler());
