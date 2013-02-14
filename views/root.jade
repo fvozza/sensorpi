@@ -1,0 +1,67 @@
+// TODO
+// Organize through templates inheritance
+
+!!!
+html
+  head
+    title Francesco's Raspberry PI node.js
+    link(rel='stylesheet', href='../express-style.css')
+    link(rel="stylesheet", href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin,latin-ext")
+    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
+
+    // Load external js libs
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js")
+    script(src="/socket.io/socket.io.js")
+    
+  body
+    section#content
+      header
+        nav.clearfix
+          a.active(href="#") Home
+          a(href="#about") About
+          span#temp
+            a#temp Temperature
+        section#logo
+          span.express
+            | Coming Soon
+          span.description
+            | Something with 
+            a(href="http://www.raspberrypi.org/", title="Raspberry PI") Raspberry PI
+    section#intro
+      div.content
+        div#boxes.clearfix
+          section#about
+            h3 About
+            p
+              | Building something cool (?) with Raspberry PI, node.js and 1-wire sensors
+          
+    a#top(href="#", img src="arrow.png")
+    footer
+      div#footer-content.clearfix
+        p
+          | (c) 2013 Francesco Vozza. All rights reserved -
+          | Powered by: raspberry pi | node.js | express | jade | mongodb | owfs
+          
+    script
+      $(document).ready(function() {
+        initNavbar();
+        ioSocketInit();
+      });
+      
+      function initNavbar() {
+        $("nav").click(function(e) {
+          if (e.target.id != "temp") {
+            e.currentTarget.getElementsByClassName("active")[0].className = "";
+            e.target.className = "active";
+          }
+        });
+      }
+
+      function ioSocketInit() {
+        var socket = io.connect('http://localhost');
+        socket.on('sensordata', function (sensor) {
+          //console.log(data);
+          $("#temp a").text(sensor.data.toFixed(2).toString());
+          socket.emit('sensorupdated', { sensor: sensor });
+        });
+      }
