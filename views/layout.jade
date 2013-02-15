@@ -1,7 +1,7 @@
 // TODO
 // Organize through templates inheritance
 
-!!!
+doctype 5
 html
   head
     title Francesco's Raspberry PI node.js
@@ -21,52 +21,14 @@ html
           a(href="#about") About
           span#temp
             a#temp Temperature
-        section#logo
-          span.express
-            | Coming Soon
-          span.description
-            | Something with 
-            a(href="http://www.raspberrypi.org/", title="Raspberry PI") Raspberry PI
-    section#intro
-      div.content
-        div#boxes.clearfix
-          section#about
-            h3 About
-            p
-              | Building something cool (?) with Raspberry PI, node.js and 1-wire sensors
-          
-    a#top(href="#", img src="arrow.png")
-    footer
-      div#footer-content.clearfix
-        p
-          | (c) 2013 Francesco Vozza. All rights reserved -
-          | Powered by: raspberry pi | node.js | express | jade | mongodb | owfs
-          
-    script
-      $(document).ready(function() {
-        setInterval(function() {
-          $.getJSON('/temp', function(data) {
-            $("#temp a").text(data.temp);
-          });
-        }, 1000);
-        
-        initNavbar();
-        ioSocketInit();
-      });
-      
-      function initNavbar() {
-        $("nav").click(function(e) {
-          if (e.target.id != "temp") {
-            e.currentTarget.getElementsByClassName("active")[0].className = "";
-            e.target.className = "active";
-          }
-        });
-      }
 
-      function ioSocketInit() {
-        var socket = io.connect('http://localhost');
-        socket.on('news', function (data) {
-          console.log(data);
-          socket.emit('my other event', { my: 'data' });
-        });
-      }
+  block content
+
+  footer
+    div#footer-content.clearfix
+      p
+        | (c) 2013 Francesco Vozza. All rights reserved -
+        | Powered by: raspberry pi | node.js | express | jade | mongodb | 1wire
+
+  block script
+ 
