@@ -7,6 +7,8 @@ block content
     span.description
       | Something with 
       a(href="http://www.raspberrypi.org/", title="Raspberry PI") Raspberry PI
+  section#chart
+    a This is a chart
   section#intro
     div.content
       div#boxes.clearfix
@@ -21,6 +23,7 @@ block script
     $(document).ready(function() {
       initNavbar();
       ioSocketInit();
+      initChart();
     });
     
     function initNavbar() {
@@ -33,11 +36,35 @@ block script
     }
 
     function ioSocketInit() {
-      //var socket = io.connect('http://zi0n.no-ip.org');
-      var socket = io.connect('http://localhost');
+      var socket = io.connect('http://zi0n.no-ip.org');
+      //var socket = io.connect('http://localhost');
       socket.on('sensordata', function (sensor) {
         //console.log(data);
         $("#temp a").text(sensor.data.toFixed(2).toString());
         //socket.emit('sensorupdated', { sensor: sensor });
       });
     }
+    
+    function initChart() {
+      $.getJSON('/temp', function(data) {
+        chartdata = data.map(function(item) {
+          return [Date.parse(item.date), parseInt(item.temp)];
+        });
+        var tempChart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'chart',
+                type: 'line'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            title: {
+                text: 'Temperature'
+            },
+            series: [{
+                name: 'Temperature',
+                data: chartdata
+            }]
+        });  
+      });
+    };

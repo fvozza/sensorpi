@@ -47,7 +47,7 @@ Sensor.prototype.start = function() {
         console.log(error);
         self.data = 0;
       }
-      self.date = new Date().toISOString();
+      self.date = new Date();
       self.emit('data', self);
     });
   }, this.interval);

@@ -1,8 +1,33 @@
 var express = require('express');
 var Sensor = new require('./sensors.js').Sensor;
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema;
 
-var t1 = new Sensor('', 3000);
+// MongoDB stuff
+
+mongoose.connect('mongodb://localhost/test');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+
+var TemperatureSchema = new Schema({
+  date:  Date,
+  temp:  Number
+});
+
+mongoose.model('Temperature', TemperatureSchema);
+
+var Temperature = mongoose.model('Temperature');
+
+// Sensor stuff
+
+var t1 = new Sensor('', 15*60*1000); // 15 min updates
 t1.start();
+
+t1.on('data', function (sensor) {
+  new Temperature({date: sensor.date, temp: sensor.data}).save();
+});
+
+// Express stuff
 
 var app = express()
   , http = require('http')
@@ -20,16 +45,25 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.engine('jade', require('jade').__express);
 
+// Routes
+
 app.get('/', function (req, res, next) {
   res.render('root');
 });
 
-/* Replace this with socket.io */
+
 app.get('/temp', function (req, res) {
-  res.send({
-    'temp': t1.read().toFixed(2).toString(),
+  Temperature.find({},'date temp -_id', function (err, results) {
+    if (err) { 
+      console.log(err);
+      return;
+    }
+    res.send(results);
   });
 });
+
+
+// Socket.io stuff
 
 io.sockets.on('connection', function (socket) {
   t1.on('data', function (sensor) {
@@ -39,5 +73,3 @@ io.sockets.on('connection', function (socket) {
     console.log("Sensor updated..");
   });
 });
-
-
