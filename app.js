@@ -3,6 +3,26 @@ var Sensor = new require('./sensors.js').Sensor;
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
 
+var app = express()
+  , http = require('http')
+  , server = http.createServer(app)
+  , io = require('socket.io').listen(server);
+
+// Misc config variables
+var port = 80;
+
+io.enable('browser client minification');  // send minified client
+io.enable('browser client etag');          // apply etag caching logic based on version number
+io.enable('browser client gzip');          // gzip the file
+io.set('log level', 1);                    // reduce logging
+
+if ('development' == app.get('env')) {
+  port = 8000;
+  app.locals({
+    development: true,
+  });
+}
+
 // MongoDB stuff
 
 mongoose.connect('mongodb://localhost/test');
@@ -25,17 +45,12 @@ t1.start();
 
 t1.on('data', function (sensor) {
   new Temperature({date: sensor.date, temp: sensor.data}).save();
+  io.sockets.emit('sensordata', sensor);
 });
 
 // Express stuff
 
-var app = express()
-  , http = require('http')
-  , server = http.createServer(app)
-  , io = require('socket.io').listen(server);
-
-// app.listen(8000); won't work with socket.io
-server.listen(80);
+server.listen(port);
 
 app.use(express.logger({format: 'short'}));
 app.use(express.errorHandler());
@@ -63,13 +78,8 @@ app.get('/temp', function (req, res) {
 });
 
 
-// Socket.io stuff
+// Push temperature upon socket.io connectin establishment
 
-io.sockets.on('connection', function (socket) {
-  t1.on('data', function (sensor) {
-    io.sockets.emit('sensordata', sensor);
-  });
-  socket.on('sensorupdated', function (sensor) {
-    console.log("Sensor updated..");
-  });
+io.sockets.on('connection', function (socket) {  
+  t1.pushUpdate();
 });

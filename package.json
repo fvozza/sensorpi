@@ -1,0 +1,11 @@
+{
+    "name": "sensorpi",
+    "author": "Francesco Vozza <fvozza@gmail.com>",
+    "description": "Playing around with node.js, express and sensors",
+    "version": "0.0.1",
+    "dependencies": {
+        "express": "3.x",
+        "socket.io": "0.9",
+        "momgoose": "*",
+    }
+}

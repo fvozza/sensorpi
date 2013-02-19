@@ -7,14 +7,18 @@ var util = require("util"),
     events = require("events"),
     fs = require('fs');
 
-//var sensor_path = "/sys/bus/w1/devices/w1_bus_master1/28-0000045885ef/";
-var sensor_path = "./28-0000045885ef/";  // test path
+if ('development' == process.env.NODE_ENV) {
+  var sensor_path = "./28-0000045885ef/";  // test path
+} else {
+  var sensor_path = "/sys/bus/w1/devices/w1_bus_master1/28-0000045885ef/";
+}
 
 // Class for a OWFS Sensor
 function Sensor(interval) {
-  interval = interval || 1000;  // sensor polling interval
+  interval = interval || 10000;  // sensor polling interval
 
   events.EventEmitter.call(this);
+  this.previous = 0;
   this.data = 0;
   this.date = undefined;
   this.interval = interval;
@@ -47,8 +51,11 @@ Sensor.prototype.start = function() {
         console.log(error);
         self.data = 0;
       }
-      self.date = new Date();
-      self.emit('data', self);
+      if (self.data != self.previous) {
+        self.previous = self.data;
+        self.date = new Date();
+        self.emit('data', self);
+      }
     });
   }, this.interval);
 }
@@ -63,6 +70,11 @@ Sensor.prototype.read = function () {
   return this.data;
 }
 
+// Force emit of 
+Sensor.prototype.pushUpdate = function () {
+  self.emit('data', self);
+}
+
 /* Example 1-wire data:
 95 01 4b 46 7f ff 0b 10 0b : crc=0b YES
 95 01 4b 46 7f ff 0b 10 0b t=25312
@@ -71,7 +83,7 @@ function parseTemp(data) {
   crc = data.match(/.*crc=(\w\w)\s(YES|NO)/)[2];
   if (crc != 'YES') throw "Error reading sensor. Bad CRC!";
   temp = data.match(/.*t=(.*)/)[1];
-  return temp/1000;
+  return (temp/1000).toFixed();
 }
 
 exports.Sensor = Sensor;
